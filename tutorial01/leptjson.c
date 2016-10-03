@@ -60,6 +60,7 @@ static int lept_parse_value(lept_context* c, lept_value* v) {
 // 解析 JSON
 int lept_parse(lept_value* v, const char* json) {
     lept_context c;
+	int ret;
     assert(v != NULL);
     c.json = json;
     v->type = LEPT_NULL;		// 若 lept_parse() 失败，会把 v 设为 null 类型，所以这里先把它设为 null，让 lept_parse_value() 写入解析出来的根值。
@@ -71,6 +72,7 @@ int lept_parse(lept_value* v, const char* json) {
 	* 若 json 在一个值之后，空白之后还有其它字符，则要返回 LEPT_PARSE_ROOT_NOT_SINGULAR。
 	*
 	*/
+/*
 	int ret = lept_parse_value(&c, v);
 	if(ret == LEPT_PARSE_INVALID_VALUE)
 		return ret;
@@ -85,6 +87,18 @@ int lept_parse(lept_value* v, const char* json) {
 			return LEPT_PARSE_ROOT_NOT_SINGULAR;
 		}
 	}
+*/
+	if((ret = lept_parse_value(&c, v)) == LEPT_PARSE_OK)
+	{
+		lept_parse_whitespace(&c);		// 比我的代码效率更高，因为我的还需要再调用函数，其实是多此一举
+		if(*c.json != '\0')
+		{
+			ret = LEPT_PARSE_ROOT_NOT_SINGULAR;
+			v->type = LEPT_NULL;
+		}
+			
+	}
+	return ret;
 }
 
 lept_type lept_get_type(const lept_value* v) {
